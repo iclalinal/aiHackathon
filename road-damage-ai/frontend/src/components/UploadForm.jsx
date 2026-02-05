@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
+import api from "../services/api";
 
 const UploadForm = () => {
   const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [location, setLocation] = useState(null);
   const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [reportId, setReportId] = useState(null);
+  const [polling, setPolling] = useState(false);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -17,7 +22,45 @@ const UploadForm = () => {
     );
   }, []);
 
-  const handleSubmit = () => {
+  // Poll for analysis result
+  useEffect(() => {
+    if (!reportId || !polling) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const response = await api.getReportStatus(reportId);
+        if (response.status === 'analyzed') {
+          setResult({
+            type: response.damage_type || 'Bilinmiyor',
+            severity: response.severity || 'medium',
+            estimated_cost: response.estimated_cost || 0,
+          });
+          setPolling(false);
+          setLoading(false);
+        } else if (response.status === 'rejected') {
+          setPolling(false);
+          setLoading(false);
+          alert('Rapor reddedildi.');
+        }
+      } catch (error) {
+        console.error('Polling error:', error);
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [reportId, polling]);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
+      setResult(null);
+      setReportId(null);
+    }
+  };
+
+  const handleSubmit = async () => {
     if (!image) {
       alert("Fotoğraf yüklenmesi zorunludur.");
       return;
@@ -27,12 +70,44 @@ const UploadForm = () => {
       return;
     }
 
-    // Hackathon için mock AI sonucu
-    setResult({
-      type: "Çukur",
-      severity: "high",
-      estimated_cost: 380,
-    });
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('image', image);
+      formData.append('latitude', location.lat);
+      formData.append('longitude', location.lng);
+
+      const response = await api.submitReport(formData);
+      
+      if (response.success && response.data.id) {
+        setReportId(response.data.id);
+        setPolling(true);
+      } else {
+        throw new Error('Rapor gönderilemedi');
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
+      alert('Şikayet gönderilirken bir hata oluştu: ' + error.message);
+      setLoading(false);
+    }
+  };
+
+  const getSeverityText = (severity) => {
+    const texts = { low: 'Düşük', medium: 'Orta', high: 'Yüksek' };
+    return texts[severity] || severity;
+  };
+
+  const getDamageTypeText = (type) => {
+    const types = {
+      pothole: 'Çukur',
+      crack: 'Çatlak',
+      rutting: 'Tekerlek İzi',
+      patching: 'Yama',
+      erosion: 'Aşınma',
+    };
+    return types[type] || type;
   };
 
   return (
@@ -52,14 +127,26 @@ const UploadForm = () => {
             type="file"
             accept="image/*"
             hidden
-            onChange={(e) => setImage(e.target.files[0])}
+            onChange={handleImageChange}
           />
 
-          <p style={{ fontSize: 16 }}>
-            {image
-              ? `Seçilen dosya: ${image.name}`
-              : "Fotoğraf yüklemek için tıklayın"}
-          </p>
+          {imagePreview ? (
+            <img 
+              src={imagePreview} 
+              alt="Preview" 
+              style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 8 }}
+            />
+          ) : (
+            <p style={{ fontSize: 16 }}>
+              Fotoğraf yüklemek için tıklayın
+            </p>
+          )}
+
+          {image && (
+            <p style={{ fontSize: 14, marginTop: 8 }}>
+              Seçilen dosya: {image.name}
+            </p>
+          )}
 
           <p style={{ opacity: 0.6, marginTop: 6 }}>
   JPG / PNG formatları desteklenmektedir <strong>(zorunlu)</strong>
@@ -105,8 +192,8 @@ const UploadForm = () => {
         )}
 
         <div className="button-center">
-          <button onClick={handleSubmit}>
-            Şikayet Gönder
+          <button onClick={handleSubmit} disabled={loading}>
+            {loading ? (polling ? 'Analiz ediliyor...' : 'Gönderiliyor...') : 'Şikayet Gönder'}
           </button>
         </div>
       </div>
@@ -119,13 +206,13 @@ const UploadForm = () => {
           </h3>
 
           <p>
-            <b>Hasar Türü:</b> {result.type}
+            <b>Hasar Türü:</b> {getDamageTypeText(result.type)}
           </p>
 
           <p>
             <b>Önem Seviyesi:</b>{" "}
             <span className={`badge ${result.severity}`}>
-              Yüksek
+              {getSeverityText(result.severity)}
             </span>
           </p>
 
@@ -133,6 +220,12 @@ const UploadForm = () => {
             <b>Tahmini Müdahale Maliyeti:</b>{" "}
             {result.estimated_cost} TL
           </p>
+
+          {reportId && (
+            <p style={{ marginTop: 12, fontSize: 12, opacity: 0.7 }}>
+              Rapor ID: {reportId}
+            </p>
+          )}
         </div>
       )}
     </>
