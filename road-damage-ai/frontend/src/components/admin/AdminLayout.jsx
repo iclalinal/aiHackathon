@@ -1,0 +1,93 @@
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { useAuth } from '../../context/AuthContext';
+
+export default function AdminLayout({ children, title }) {
+  const { user, loading, isAuthenticated, logout } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push('/admin/login');
+    }
+  }, [loading, isAuthenticated, router]);
+
+  if (loading) {
+    return (
+      <div className="admin-loading">
+        <div className="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  const navItems = [
+    { href: '/admin/dashboard', label: 'Dashboard', icon: '📊' },
+    { href: '/admin/reports', label: 'Reports', icon: '📋' },
+    { href: '/admin/map', label: 'Map View', icon: '🗺️' },
+  ];
+
+  return (
+    <div className="admin-layout">
+      {/* Sidebar */}
+      <aside className="admin-sidebar">
+        <div className="sidebar-header">
+          <h2>🛣️ Road Damage</h2>
+          <span className="admin-badge">Admin</span>
+        </div>
+
+        <nav className="sidebar-nav">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`nav-item ${router.pathname === item.href ? 'active' : ''}`}
+            >
+              <span className="nav-icon">{item.icon}</span>
+              <span className="nav-label">{item.label}</span>
+            </Link>
+          ))}
+        </nav>
+
+        <div className="sidebar-footer">
+          <div className="user-info">
+            <span className="user-avatar">👤</span>
+            <div className="user-details">
+              <span className="user-name">{user?.fullName || user?.username}</span>
+              <span className="user-role">Administrator</span>
+            </div>
+          </div>
+          <button onClick={logout} className="logout-btn">
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="admin-main">
+        <header className="admin-header">
+          <h1>{title}</h1>
+          <div className="header-actions">
+            <span className="current-date">
+              {new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </span>
+          </div>
+        </header>
+
+        <div className="admin-content">
+          {children}
+        </div>
+      </main>
+    </div>
+  );
+}
