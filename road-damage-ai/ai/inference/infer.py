@@ -3,9 +3,14 @@ import cv2
 import os
 import uuid
 
-model = YOLO("ai/models/best.pt")
+# Get the directory where this script is located
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+AI_DIR = os.path.dirname(SCRIPT_DIR)  # Parent 'ai' directory
+MODEL_PATH = os.path.join(AI_DIR, "models", "best.pt")
 
-OUTPUT_DIR = "outputs"
+model = YOLO(MODEL_PATH)
+
+OUTPUT_DIR = os.path.join(os.path.dirname(AI_DIR), "outputs")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def analyze_image(image_path):
