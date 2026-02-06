@@ -13,6 +13,15 @@
   --header-bg: #f1f3f5;
   --header-text: #111827;
   --header-subtext: #374151;
+  --scene-road: rgba(17, 24, 39, 0.1);
+  --scene-road-border: rgba(17, 24, 39, 0.14);
+  --scene-line: rgba(242, 194, 0, 0.8);
+  --scene-glow: rgba(242, 194, 0, 0.18);
+  --scene-sky: rgba(59, 130, 246, 0.12);
+  --scene-pothole: rgba(0, 0, 0, 0.6);
+  --scene-pothole-edge: rgba(0, 0, 0, 0.25);
+  --scene-bar: rgba(255, 255, 255, 0.72);
+  --scene-bar-secondary: rgba(255, 255, 255, 0.25);
 }
 
 /* SYSTEM DARK */
@@ -26,6 +35,15 @@
     --header-bg: #202020;
     --header-text: #f9fafb;
     --header-subtext: #d1d5db;
+    --scene-road: rgba(255, 255, 255, 0.06);
+    --scene-road-border: rgba(255, 255, 255, 0.1);
+    --scene-line: rgba(242, 194, 0, 0.65);
+    --scene-glow: rgba(242, 194, 0, 0.12);
+    --scene-sky: rgba(59, 130, 246, 0.08);
+    --scene-pothole: rgba(148, 163, 184, 0.65);
+    --scene-pothole-edge: rgba(255, 255, 255, 0.18);
+    --scene-bar: rgba(8, 8, 8, 0.72);
+    --scene-bar-secondary: rgba(8, 8, 8, 0.3);
   }
 }
 
@@ -39,6 +57,15 @@
   --header-bg: #f1f3f5;
   --header-text: #111827;
   --header-subtext: #374151;
+  --scene-road: rgba(17, 24, 39, 0.1);
+  --scene-road-border: rgba(17, 24, 39, 0.14);
+  --scene-line: rgba(242, 194, 0, 0.8);
+  --scene-glow: rgba(242, 194, 0, 0.18);
+  --scene-sky: rgba(59, 130, 246, 0.12);
+  --scene-pothole: rgba(0, 0, 0, 0.6);
+  --scene-pothole-edge: rgba(0, 0, 0, 0.25);
+  --scene-bar: rgba(255, 255, 255, 0.72);
+  --scene-bar-secondary: rgba(255, 255, 255, 0.25);
 }
 
 /* MANUAL DARK */
@@ -51,6 +78,15 @@
   --header-bg: #202020;
   --header-text: #f9fafb;
   --header-subtext: #d1d5db;
+  --scene-road: rgba(255, 255, 255, 0.06);
+  --scene-road-border: rgba(255, 255, 255, 0.1);
+  --scene-line: rgba(242, 194, 0, 0.65);
+  --scene-glow: rgba(242, 194, 0, 0.12);
+  --scene-sky: rgba(59, 130, 246, 0.08);
+  --scene-pothole: rgba(148, 163, 184, 0.65);
+  --scene-pothole-edge: rgba(255, 255, 255, 0.18);
+  --scene-bar: rgba(8, 8, 8, 0.72);
+  --scene-bar-secondary: rgba(8, 8, 8, 0.3);
 }
 
 /* ===============================
@@ -261,6 +297,267 @@ hr {
   );
   box-shadow: 0 6px 18px rgba(242, 194, 0, 0.25);
   transform: translateY(-1px);
+}
+
+/* ===============================
+   PAGE SCENE (USER)
+   =============================== */
+
+.page-scene {
+  position: relative;
+  padding-bottom: 160px;
+}
+
+.page-scene-bg {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 140px;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: transparent;
+}
+
+.page-scene-content {
+  position: relative;
+  z-index: 1;
+}
+
+.scene-road {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  top: 26%;
+  height: 70px;
+  background: linear-gradient(180deg, var(--scene-road), rgba(0, 0, 0, 0.04));
+  border-radius: 999px;
+  border: 1px solid var(--scene-road-border);
+  box-shadow: inset 0 12px 28px rgba(0, 0, 0, 0.08);
+  opacity: 0.62;
+}
+
+.scene-road::before {
+  content: "";
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--scene-line) 0 18px,
+    transparent 18px 34px
+  );
+  opacity: 0.6;
+}
+
+.scene-pothole {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(0, 0, 0, 0.2), var(--scene-pothole));
+  box-shadow: inset 0 0 0 2px var(--scene-pothole-edge), 0 10px 16px rgba(0, 0, 0, 0.16);
+  opacity: 0.78;
+}
+
+.scene-pothole-primary {
+  width: 46px;
+  height: 24px;
+  left: 12%;
+  top: calc(26% + 44px);
+}
+
+.scene-pothole-secondary {
+  width: 42px;
+  height: 22px;
+  left: 48%;
+  top: calc(26% + 36px);
+  opacity: 0.8;
+}
+
+.scene-pothole-tertiary {
+  width: 50px;
+  height: 26px;
+  left: 80%;
+  top: calc(26% + 40px);
+}
+
+.scene-car {
+  position: absolute;
+  width: 48px;
+  height: 20px;
+  left: -90px;
+  top: calc(26% + 12px);
+  border-radius: 6px 6px 4px 4px;
+  background: linear-gradient(180deg, #f7d24c, #f2c200);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.18);
+  will-change: left, transform, opacity;
+  opacity: 0.82;
+}
+
+.scene-car::before,
+.scene-car::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #111827;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.15);
+}
+
+.scene-car::before {
+  left: 6px;
+}
+
+.scene-car::after {
+  right: 6px;
+}
+
+.scene-car-primary {
+  animation: scene-drive-start 12s linear infinite;
+}
+
+.scene-car-secondary {
+  top: calc(26% + 6px);
+  background: linear-gradient(180deg, #93c5fd, #60a5fa);
+  animation: scene-drive-middle 13s linear infinite;
+  animation-delay: 2.6s;
+  opacity: 0.82;
+}
+
+.scene-car-tertiary {
+  top: calc(26% + 8px);
+  background: linear-gradient(180deg, #fb7185, #f43f5e);
+  animation: scene-drive-end 14s linear infinite;
+  animation-delay: 5.2s;
+  opacity: 0.82;
+}
+
+@keyframes scene-drive-start {
+  0% {
+    left: -90px;
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  30% {
+    left: 10%;
+    transform: translateY(0) rotate(0deg);
+  }
+  38% {
+    left: 12%;
+    transform: translateY(8px) rotate(6deg);
+  }
+  46% {
+    left: 14%;
+    transform: translateY(30px) rotate(28deg) scale(0.94);
+    opacity: 0.6;
+  }
+  58% {
+    left: 15%;
+    transform: translateY(56px) rotate(48deg) scale(0.72);
+    opacity: 0;
+  }
+  100% {
+    left: 15%;
+    transform: translateY(56px) rotate(48deg) scale(0.72);
+    opacity: 0;
+  }
+}
+
+@keyframes scene-drive-middle {
+  0% {
+    left: -90px;
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  55% {
+    left: 46%;
+    transform: translateY(0) rotate(0deg);
+  }
+  63% {
+    left: 49%;
+    transform: translateY(8px) rotate(6deg);
+  }
+  72% {
+    left: 51%;
+    transform: translateY(32px) rotate(30deg) scale(0.92);
+    opacity: 0.55;
+  }
+  84% {
+    left: 52%;
+    transform: translateY(58px) rotate(50deg) scale(0.7);
+    opacity: 0;
+  }
+  100% {
+    left: 52%;
+    transform: translateY(58px) rotate(50deg) scale(0.7);
+    opacity: 0;
+  }
+}
+
+@keyframes scene-drive-end {
+  0% {
+    left: -90px;
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  70% {
+    left: 76%;
+    transform: translateY(0) rotate(0deg);
+  }
+  78% {
+    left: 80%;
+    transform: translateY(8px) rotate(6deg);
+  }
+  86% {
+    left: 82%;
+    transform: translateY(32px) rotate(30deg) scale(0.92);
+    opacity: 0.55;
+  }
+  94% {
+    left: 84%;
+    transform: translateY(58px) rotate(50deg) scale(0.7);
+    opacity: 0;
+  }
+  100% {
+    left: 84%;
+    transform: translateY(58px) rotate(50deg) scale(0.7);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-car {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-scene {
+    padding-bottom: 120px;
+  }
+
+  .page-scene-bg {
+    height: 110px;
+  }
+
+  .scene-road {
+    top: 24%;
+    height: 58px;
+  }
 }
 
 .leaflet-container {

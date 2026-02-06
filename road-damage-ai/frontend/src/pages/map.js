@@ -30,8 +30,19 @@ export default function MapPage() {
         </Link>
       </div>
 
-      <main className="container">
-        <MapView />
+      <main className="container page-scene">
+        <div className="page-scene-bg" aria-hidden="true">
+          <div className="scene-road" />
+          <div className="scene-pothole scene-pothole-primary" />
+          <div className="scene-pothole scene-pothole-secondary" />
+          <div className="scene-pothole scene-pothole-tertiary" />
+          <div className="scene-car scene-car-primary" />
+          <div className="scene-car scene-car-secondary" />
+          <div className="scene-car scene-car-tertiary" />
+        </div>
+        <div className="page-scene-content">
+          <MapView />
+        </div>
       </main>
     </>
   );
