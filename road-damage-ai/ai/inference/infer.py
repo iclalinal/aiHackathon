@@ -118,6 +118,16 @@ def analyze_image(image_path):
     if len(results.boxes) == 0:
         return None
 
+    # DEBUG: Print all detected classes
+    print(f"\n🔍 DETECTED CLASSES IN IMAGE:")
+    all_classes = set()
+    for box in results.boxes:
+        class_name = get_class_name(box, model)
+        conf = float(box.conf[0])
+        all_classes.add(class_name)
+        print(f"  - {class_name} ({conf:.2%})")
+    print(f"Available model classes: {list(model.names.values())}\n")
+
     line_detections = []
     damage_detections = []
 
@@ -128,11 +138,15 @@ def analyze_image(image_path):
         # 🟢 ÇİZGİ KONTROLÜ (Hassas davran, %10 bile olsa al)
         if any(line_name in class_name for line_name in LINE_CLASS_NAMES):
             line_detections.append(box)
+            print(f"✅ LINE DETECTED: {class_name} with {conf:.2%} confidence")
         
         # 🔴 HASAR KONTROLÜ (Sert davran, %45'ten aşağısını gölge sanıp ele)
         elif any(damage_name in class_name for damage_name in DAMAGE_CLASS_NAMES):
             if conf > 0.45:  # <-- BU AYAR ÇOK ÖNEMLİ (Gölgeyi engeller)
                 damage_detections.append(box)
+                print(f"✅ DAMAGE DETECTED: {class_name} with {conf:.2%} confidence")
+            else:
+                print(f"❌ DAMAGE REJECTED (low conf): {class_name} with {conf:.2%} confidence")
 
     # Eğer filtreleme sonrası elinde hasar kalmadıysa dön
     if len(damage_detections) == 0:
@@ -154,9 +168,22 @@ def analyze_image(image_path):
         # Use the smaller dimension as line width (lines are typically thin)
         line_pixel_width = min(line_width_px, line_height_px)
         
+        print(f"\n📏 REFERENCE LINE ANALYSIS:")
+        print(f"  Line width (px): {line_width_px:.1f}")
+        print(f"  Line height (px): {line_height_px:.1f}")
+        print(f"  Using dimension (px): {line_pixel_width:.1f}")
+        print(f"  Real line width (cm): {REAL_LINE_WIDTH_CM}")
+        
         if line_pixel_width > 0:
             cm_per_pixel = REAL_LINE_WIDTH_CM / line_pixel_width
             calculation_method = "ReferenceLine"
+            print(f"  ✅ cm/pixel ratio: {cm_per_pixel:.4f}")
+            print(f"  ✅ Using PRECISION MODE (ReferenceLine)\n")
+        else:
+            print(f"  ❌ Line too small, using Standard mode\n")
+    else:
+        print(f"\n⚠️  NO REFERENCE LINE DETECTED - Using Standard mode")
+        print(f"  Assuming frame area: {FIXED_FRAME_AREA_M2} m²\n")
 
     # ========================================================================
     # PROCESS DAMAGE DETECTIONS
@@ -165,6 +192,25 @@ def analyze_image(image_path):
     total_cost = 0.0
     processed_damages = []
     annotated_img = img.copy()
+
+    # Draw reference lines if detected (for visualization)
+    if len(line_detections) > 0:
+        for line_box in line_detections:
+            x1, y1, x2, y2, _, _, _ = get_box_dimensions(line_box)
+            conf = float(line_box.conf[0])
+            class_name = get_class_name(line_box, model)
+            
+            # Draw blue box for reference lines
+            cv2.rectangle(annotated_img, 
+                          (int(x1), int(y1)), 
+                          (int(x2), int(y2)), 
+                          (255, 255, 0), 2)  # Cyan color for lines
+            
+            # Add label
+            label = f"REF: {class_name} ({conf:.0%})"
+            cv2.putText(annotated_img, label,
+                        (int(x1), int(y1) - 5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1)
 
     for box in damage_detections:
         x1, y1, x2, y2, width_px, height_px, area_px = get_box_dimensions(box)
