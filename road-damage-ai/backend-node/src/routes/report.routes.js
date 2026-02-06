@@ -92,6 +92,9 @@ router.get('/:id/status', (req, res) => {
     res.json({
       id: report.id,
       status: report.status,
+      damage_type: report.damage_type,
+      severity: report.severity,
+      estimated_cost: report.estimated_cost,
     });
   } catch (error) {
     console.error('Get status error:', error);

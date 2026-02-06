@@ -43,6 +43,14 @@ class ReportService {
       const result = await aiService.analyzeImage(imagePath, reportId);
 
       if (result.success) {
+        // Check if damage was actually detected
+        if (!result.data.damage_type || result.data.damage_type === null) {
+          // No damage detected - delete the report
+          db.prepare('DELETE FROM damage_reports WHERE id = ?').run(reportId);
+          console.log(`🗑️ Report ${reportId} deleted - no damage detected`);
+          return;
+        }
+
         // Update report with analysis results
         const updateStmt = db.prepare(`
           UPDATE damage_reports 
