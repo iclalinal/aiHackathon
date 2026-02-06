@@ -17,8 +17,8 @@ router.post('/login', validateLogin, async (req, res) => {
 
     if (!admin) {
       return res.status(401).json({
-        error: 'Authentication failed',
-        message: 'Invalid username or password',
+        error: 'Kimlik doğrulama başarısız',
+        message: 'Geçersiz kullanıcı adı veya şifre',
       });
     }
 
@@ -27,8 +27,8 @@ router.post('/login', validateLogin, async (req, res) => {
 
     if (!isValid) {
       return res.status(401).json({
-        error: 'Authentication failed',
-        message: 'Invalid username or password',
+        error: 'Kimlik doğrulama başarısız',
+        message: 'Geçersiz kullanıcı adı veya şifre',
       });
     }
 
@@ -51,8 +51,8 @@ router.post('/login', validateLogin, async (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({
-      error: 'Login failed',
-      message: 'An error occurred during login',
+      error: 'Giriş başarısız',
+      message: 'Giriş sırasında bir hata oluştu',
     });
   }
 });
@@ -67,7 +67,7 @@ router.get('/me', authenticateToken, (req, res) => {
 
     if (!admin) {
       return res.status(404).json({
-        error: 'User not found',
+        error: 'Kullanıcı bulunamadı',
       });
     }
 
@@ -77,7 +77,7 @@ router.get('/me', authenticateToken, (req, res) => {
   } catch (error) {
     console.error('Get user error:', error);
     res.status(500).json({
-      error: 'Failed to get user info',
+      error: 'Kullanıcı bilgisi alınamadı',
     });
   }
 });
@@ -92,15 +92,15 @@ router.post('/change-password', authenticateToken, async (req, res) => {
 
     if (!currentPassword || !newPassword) {
       return res.status(400).json({
-        error: 'Validation failed',
-        message: 'Current password and new password are required',
+        error: 'Doğrulama başarısız',
+        message: 'Mevcut şifre ve yeni şifre gereklidir',
       });
     }
 
     if (newPassword.length < 8) {
       return res.status(400).json({
-        error: 'Validation failed',
-        message: 'New password must be at least 8 characters',
+        error: 'Doğrulama başarısız',
+        message: 'Yeni şifre en az 8 karakter olmalıdır',
       });
     }
 
@@ -108,12 +108,12 @@ router.post('/change-password', authenticateToken, async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Password changed successfully',
+      message: 'Şifre başarıyla değiştirildi',
     });
   } catch (error) {
     console.error('Change password error:', error);
     res.status(400).json({
-      error: 'Password change failed',
+      error: 'Şifre değiştirme başarısız',
       message: error.message,
     });
   }
@@ -128,7 +128,7 @@ router.post('/logout', authenticateToken, (req, res) => {
   // This endpoint is for acknowledgment and potential token blacklisting
   res.json({
     success: true,
-    message: 'Logged out successfully',
+    message: 'Başarıyla çıkış yapıldı',
   });
 });
 

@@ -10,8 +10,8 @@ function authenticateToken(req, res, next) {
 
   if (!token) {
     return res.status(401).json({
-      error: 'Authentication required',
-      message: 'No token provided',
+      error: 'Kimlik doğrulama gerekli',
+      message: 'Token sağlanmadı',
     });
   }
 
@@ -22,13 +22,13 @@ function authenticateToken(req, res, next) {
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({
-        error: 'Token expired',
-        message: 'Please log in again',
+        error: 'Oturum süresi doldu',
+        message: 'Lütfen tekrar giriş yapın',
       });
     }
     return res.status(403).json({
-      error: 'Invalid token',
-      message: 'Token verification failed',
+      error: 'Geçersiz token',
+      message: 'Token doğrulama başarısız',
     });
   }
 }

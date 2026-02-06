@@ -66,6 +66,17 @@ export default function ReportTable({ reports, onStatusChange, onViewDetails }) 
     }).format(amount);
   };
 
+  const getDamageTypeText = (type) => {
+    const types = {
+      pothole: 'Çukur',
+      crack: 'Çatlak',
+      rutting: 'Tekerlek İzi',
+      patching: 'Yama',
+      erosion: 'Aşınma',
+    };
+    return types[type] || type || '-';
+  };
+
   return (
     <div className="table-container">
       <table className="report-table">
@@ -112,20 +123,20 @@ export default function ReportTable({ reports, onStatusChange, onViewDetails }) 
                     href={`https://www.google.com/maps?q=${report.latitude},${report.longitude}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    title="View on Google Maps"
+                    title="Google Haritalar'da Görüntüle"
                   >
                     📍 {report.latitude?.toFixed(4)}, {report.longitude?.toFixed(4)}
                   </a>
                 </td>
                 <td>
                   <span className="damage-type">
-                    {report.damage_type || '-'}
+                    {getDamageTypeText(report.damage_type)}
                   </span>
                 </td>
                 <td>
                   {report.severity ? (
                     <span className={`badge ${getSeverityBadge(report.severity)}`}>
-                      {report.severity}
+                      {report.severity === 'low' ? 'Düşük' : report.severity === 'medium' ? 'Orta' : report.severity === 'high' ? 'Yüksek' : report.severity}
                     </span>
                   ) : (
                     '-'
@@ -134,7 +145,7 @@ export default function ReportTable({ reports, onStatusChange, onViewDetails }) 
                 <td>{formatCurrency(report.estimated_cost)}</td>
                 <td>
                   <span className={`badge ${getStatusBadge(report.status)}`}>
-                    {report.status}
+                    {report.status === 'pending' ? 'Bekliyor' : report.status === 'analyzing' ? 'Analiz Ediliyor' : report.status === 'analyzed' ? 'Analiz Edildi' : report.status === 'repaired' ? 'Onarıldı' : report.status === 'rejected' ? 'Reddedildi' : report.status}
                   </span>
                 </td>
                 <td className="actions-cell">

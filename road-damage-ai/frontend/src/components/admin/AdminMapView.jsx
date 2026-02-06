@@ -61,6 +61,33 @@ export default function AdminMapView({ reports, onMarkerClick, selectedReport, v
       return colors[severity] || '#3b82f6';
     };
 
+    const getDamageTypeText = (type) => {
+      const types = {
+        pothole: 'Çukur',
+        crack: 'Çatlak',
+        rutting: 'Tekerlek İzi',
+        patching: 'Yama',
+        erosion: 'Aşınma',
+      };
+      return types[type] || type || 'Bilinmiyor';
+    };
+
+    const getSeverityText = (severity) => {
+      const texts = { low: 'Düşük', medium: 'Orta', high: 'Yüksek' };
+      return texts[severity] || severity || 'Belirsiz';
+    };
+
+    const getStatusText = (status) => {
+      const texts = {
+        pending: 'Bekliyor',
+        analyzing: 'Analiz Ediliyor',
+        analyzed: 'Analiz Edildi',
+        repaired: 'Onarıldı',
+        rejected: 'Reddedildi',
+      };
+      return texts[status] || status;
+    };
+
     const getMarkerIcon = (severity, status, isGroup = false, reportCount = 1) => {
       const color = getMarkerColor(severity, status);
       
@@ -134,7 +161,7 @@ export default function AdminMapView({ reports, onMarkerClick, selectedReport, v
             <div style="min-width: 200px;">
               <strong>📁 ${item.reportCount} Şikayet</strong><br/>
               <span style="color: ${getMarkerColor(item.severity, null)}">
-                ${item.group?.severities?.join(', ') || 'Belirsiz'} şiddet
+                ${item.group?.severities?.map(s => getSeverityText(s)).join(', ') || 'Belirsiz'} şiddet
               </span><br/>
               <small>Detaylar için tıklayın</small>
             </div>
@@ -143,11 +170,11 @@ export default function AdminMapView({ reports, onMarkerClick, selectedReport, v
           // Regular report popup
           marker.bindPopup(`
             <div style="min-width: 200px;">
-              <strong>${item.damage_type || 'Bilinmiyor'}</strong><br/>
+              <strong>${getDamageTypeText(item.damage_type)}</strong><br/>
               <span style="color: ${getMarkerColor(item.severity, item.status)}">
-                ${item.severity || 'Bekliyor'} şiddet
+                ${getSeverityText(item.severity)} şiddet
               </span><br/>
-              <small>Durum: ${item.status}</small><br/>
+              <small>Durum: ${getStatusText(item.status)}</small><br/>
               ${item.estimated_cost ? `<small>Tahmini maliyet: ₺${item.estimated_cost.toFixed(2)}</small>` : ''}
             </div>
           `);

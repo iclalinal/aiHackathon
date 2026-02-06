@@ -37,6 +37,17 @@ export default function AdminDashboard() {
     }).format(amount);
   };
 
+  const getDamageTypeText = (type) => {
+    const types = {
+      pothole: 'Çukur',
+      crack: 'Çatlak',
+      rutting: 'Tekerlek İzi',
+      patching: 'Yama',
+      erosion: 'Aşınma',
+    };
+    return types[type] || type || 'Bilinmiyor';
+  };
+
   if (loading) {
     return (
       <AdminLayout title="Kontrol Paneli">
@@ -102,7 +113,7 @@ export default function AdminDashboard() {
             <div className="severity-chart">
               {stats?.bySeverity?.map((item) => (
                 <div key={item.severity} className="chart-bar-container">
-                  <span className="bar-label">{item.severity}</span>
+                  <span className="bar-label">{item.severity === 'low' ? 'Düşük' : item.severity === 'medium' ? 'Orta' : item.severity === 'high' ? 'Yüksek' : item.severity}</span>
                   <div className="bar-wrapper">
                     <div
                       className={`chart-bar severity-${item.severity}`}
@@ -123,7 +134,7 @@ export default function AdminDashboard() {
             <div className="damage-type-list">
               {stats?.byDamageType?.map((item) => (
                 <div key={item.damage_type} className="type-item">
-                  <span className="type-name">{item.damage_type}</span>
+                  <span className="type-name">{getDamageTypeText(item.damage_type)}</span>
                   <span className="type-count">{item.count}</span>
                 </div>
               ))}
@@ -149,7 +160,7 @@ export default function AdminDashboard() {
                   <span className={`status-dot status-${report.status}`} />
                   <div className="report-details">
                     <span className="report-type">
-                      {report.damage_type || 'Analiz Bekliyor'}
+                      {getDamageTypeText(report.damage_type) || 'Analiz Bekliyor'}
                     </span>
                     <span className="report-date">
                       {new Date(report.created_at).toLocaleDateString('tr-TR')}
@@ -159,10 +170,12 @@ export default function AdminDashboard() {
                 <div className="report-meta">
                   {report.severity && (
                     <span className={`severity-badge severity-${report.severity}`}>
-                      {report.severity}
+                      {report.severity === 'low' ? 'Düşük' : report.severity === 'medium' ? 'Orta' : report.severity === 'high' ? 'Yüksek' : report.severity}
                     </span>
                   )}
-                  <span className="report-status">{report.status}</span>
+                  <span className="report-status">
+                    {report.status === 'pending' ? 'Bekliyor' : report.status === 'analyzing' ? 'Analiz Ediliyor' : report.status === 'analyzed' ? 'Analiz Edildi' : report.status === 'repaired' ? 'Onarıldı' : report.status === 'rejected' ? 'Reddedildi' : report.status}
+                  </span>
                 </div>
               </div>
             ))}

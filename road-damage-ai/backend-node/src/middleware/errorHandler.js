@@ -6,11 +6,11 @@ function errorHandler(err, req, res, next) {
 
   // Default error response
   const statusCode = err.statusCode || 500;
-  const message = err.message || 'Internal server error';
+  const message = err.message || 'Sunucu hatası';
 
   // Don't expose internal errors in production
   const response = {
-    error: statusCode === 500 ? 'Internal server error' : message,
+    error: statusCode === 500 ? 'Sunucu hatası' : message,
     ...(process.env.NODE_ENV === 'development' && {
       stack: err.stack,
       details: err.details,

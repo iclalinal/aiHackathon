@@ -64,6 +64,17 @@ export default function AdminMap() {
     return report.status === filter;
   });
 
+  const getDamageTypeText = (type) => {
+    const types = {
+      pothole: 'Çukur',
+      crack: 'Çatlak',
+      rutting: 'Tekerlek İzi',
+      patching: 'Yama',
+      erosion: 'Aşınma',
+    };
+    return types[type] || type || 'Bilinmiyor';
+  };
+
   const filteredGroups = groups.filter((group) => {
     if (filter === 'all') return true;
     if (filter === 'unrepaired') return group.reports.some(r => r.status !== 'repaired');
@@ -255,10 +266,10 @@ export default function AdminMap() {
                       <div className="report-item-header">
                         <span className={`severity-dot severity-${report.severity || 'pending'}`} />
                         <span className="damage-type">
-                          {report.damage_type || 'Bekliyor'}
+                          {getDamageTypeText(report.damage_type) || 'Bekliyor'}
                         </span>
                         <span className={`status-tag status-${report.status}`}>
-                          {report.status}
+                          {report.status === 'pending' ? 'Bekliyor' : report.status === 'analyzing' ? 'Analiz Ediliyor' : report.status === 'analyzed' ? 'Analiz Edildi' : report.status === 'repaired' ? 'Onarıldı' : report.status === 'rejected' ? 'Reddedildi' : report.status}
                         </span>
                       </div>
                       <div className="report-item-details">

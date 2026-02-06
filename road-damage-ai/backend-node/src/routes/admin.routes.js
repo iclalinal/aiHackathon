@@ -42,7 +42,7 @@ router.get('/reports', (req, res) => {
   } catch (error) {
     console.error('Get admin reports error:', error);
     res.status(500).json({
-      error: 'Failed to get reports',
+      error: 'Raporlar alınamadı',
     });
   }
 });
@@ -72,7 +72,7 @@ router.get('/reports-grouped', (req, res) => {
   } catch (error) {
     console.error('Get grouped reports error:', error);
     res.status(500).json({
-      error: 'Failed to get grouped reports',
+      error: 'Gruplu raporlar alınamadı',
     });
   }
 });
@@ -87,7 +87,7 @@ router.get('/reports/:id', (req, res) => {
 
     if (!report) {
       return res.status(404).json({
-        error: 'Report not found',
+        error: 'Rapor bulunamadı',
       });
     }
 
@@ -97,7 +97,7 @@ router.get('/reports/:id', (req, res) => {
   } catch (error) {
     console.error('Get admin report error:', error);
     res.status(500).json({
-      error: 'Failed to get report',
+      error: 'Rapor alınamadı',
     });
   }
 });
@@ -120,19 +120,19 @@ router.patch('/reports/:id/status', validateStatusUpdate, (req, res) => {
 
     if (!updatedReport) {
       return res.status(404).json({
-        error: 'Report not found',
+        error: 'Rapor bulunamadı',
       });
     }
 
     res.json({
       success: true,
-      message: `Report status updated to "${status}"`,
+      message: `Rapor durumu "${status}" olarak güncellendi`,
       data: updatedReport,
     });
   } catch (error) {
     console.error('Update status error:', error);
     res.status(500).json({
-      error: 'Failed to update status',
+      error: 'Durum güncellenemedi',
     });
   }
 });
@@ -155,19 +155,19 @@ router.post('/reports/:id/repair', (req, res) => {
 
     if (!updatedReport) {
       return res.status(404).json({
-        error: 'Report not found',
+        error: 'Rapor bulunamadı',
       });
     }
 
     res.json({
       success: true,
-      message: 'Report marked as repaired',
+      message: 'Rapor onarıldı olarak işaretlendi',
       data: updatedReport,
     });
   } catch (error) {
     console.error('Mark repaired error:', error);
     res.status(500).json({
-      error: 'Failed to mark as repaired',
+      error: 'Onarıldı olarak işaretlenemedi',
     });
   }
 });
@@ -186,7 +186,7 @@ router.get('/statistics', (req, res) => {
   } catch (error) {
     console.error('Get statistics error:', error);
     res.status(500).json({
-      error: 'Failed to get statistics',
+      error: 'İstatistikler alınamadı',
     });
   }
 });
@@ -221,7 +221,7 @@ router.get('/map', (req, res) => {
   } catch (error) {
     console.error('Get admin map error:', error);
     res.status(500).json({
-      error: 'Failed to get map data',
+      error: 'Harita verileri alınamadı',
     });
   }
 });

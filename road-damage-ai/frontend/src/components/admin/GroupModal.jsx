@@ -29,6 +29,17 @@ export default function GroupModal({ group, onClose, onStatusChange, onViewRepor
     return colors[severity] || '#6b7280';
   };
 
+  const getDamageTypeText = (type) => {
+    const types = {
+      pothole: 'Çukur',
+      crack: 'Çatlak',
+      rutting: 'Tekerlek İzi',
+      patching: 'Yama',
+      erosion: 'Aşınma',
+    };
+    return types[type] || type || '-';
+  };
+
   const handleMarkAllRepaired = async () => {
     if (!confirm('Bu gruptaki tüm raporları onarıldı olarak işaretlemek istediğinize emin misiniz?')) {
       return;
@@ -93,7 +104,7 @@ export default function GroupModal({ group, onClose, onStatusChange, onViewRepor
                     color: 'white',
                     textTransform: 'uppercase',
                   }}>
-                    {sev}
+                    {sev === 'low' ? 'Düşük' : sev === 'medium' ? 'Orta' : sev === 'high' ? 'Yüksek' : sev}
                   </span>
                 ))}
               </div>
@@ -128,7 +139,7 @@ export default function GroupModal({ group, onClose, onStatusChange, onViewRepor
                 {group.reports.map((report) => (
                   <tr key={report.id}>
                     <td style={{ fontSize: 13 }}>{formatDate(report.created_at)}</td>
-                    <td style={{ textTransform: 'capitalize' }}>{report.damage_type || '-'}</td>
+                    <td>{getDamageTypeText(report.damage_type)}</td>
                     <td>
                       {report.severity && (
                         <span style={{
@@ -139,14 +150,14 @@ export default function GroupModal({ group, onClose, onStatusChange, onViewRepor
                           color: 'white',
                           textTransform: 'uppercase',
                         }}>
-                          {report.severity}
+                          {report.severity === 'low' ? 'Düşük' : report.severity === 'medium' ? 'Orta' : report.severity === 'high' ? 'Yüksek' : report.severity}
                         </span>
                       )}
                     </td>
                     <td>{formatCurrency(report.estimated_cost)}</td>
                     <td>
                       <span className={`badge badge-${report.status === 'repaired' ? 'green' : report.status === 'analyzed' ? 'purple' : 'gray'}`}>
-                        {report.status}
+                        {report.status === 'pending' ? 'Bekliyor' : report.status === 'analyzing' ? 'Analiz Ediliyor' : report.status === 'analyzed' ? 'Analiz Edildi' : report.status === 'repaired' ? 'Onarıldı' : report.status === 'rejected' ? 'Reddedildi' : report.status}
                       </span>
                     </td>
                     <td>

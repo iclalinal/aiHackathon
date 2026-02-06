@@ -36,7 +36,7 @@ router.post(
     } catch (error) {
       console.error('Create report error:', error);
       res.status(500).json({
-        error: 'Failed to create report',
+        error: 'Rapor oluşturulamadı',
         message: error.message,
       });
     }
@@ -53,7 +53,7 @@ router.get('/:id', (req, res) => {
 
     if (!report) {
       return res.status(404).json({
-        error: 'Report not found',
+        error: 'Rapor bulunamadı',
       });
     }
 
@@ -70,7 +70,7 @@ router.get('/:id', (req, res) => {
   } catch (error) {
     console.error('Get report error:', error);
     res.status(500).json({
-      error: 'Failed to get report',
+      error: 'Rapor alınamadı',
     });
   }
 });
@@ -85,7 +85,7 @@ router.get('/:id/status', (req, res) => {
 
     if (!report) {
       return res.status(404).json({
-        error: 'Report not found',
+        error: 'Rapor bulunamadı',
       });
     }
 
@@ -99,7 +99,7 @@ router.get('/:id/status', (req, res) => {
   } catch (error) {
     console.error('Get status error:', error);
     res.status(500).json({
-      error: 'Failed to get status',
+      error: 'Durum alınamadı',
     });
   }
 });
@@ -131,7 +131,7 @@ router.get('/map/markers', (req, res) => {
   } catch (error) {
     console.error('Get map reports error:', error);
     res.status(500).json({
-      error: 'Failed to get map reports',
+      error: 'Harita raporları alınamadı',
     });
   }
 });

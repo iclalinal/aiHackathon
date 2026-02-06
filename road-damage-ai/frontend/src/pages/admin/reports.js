@@ -305,7 +305,7 @@ export default function AdminReports() {
                       color: 'white',
                       textTransform: 'uppercase',
                     }}>
-                      {sev}
+                      {sev === 'low' ? 'Düşük' : sev === 'medium' ? 'Orta' : sev === 'high' ? 'Yüksek' : sev}
                     </span>
                   ))}
                 </div>

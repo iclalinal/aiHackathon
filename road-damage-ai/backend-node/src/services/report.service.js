@@ -27,7 +27,7 @@ class ReportService {
     return {
       id: reportId,
       status: 'pending',
-      message: 'Report submitted successfully. Analysis in progress.',
+      message: 'Rapor başarıyla gönderildi. Analiz devam ediyor.',
     };
   }
 

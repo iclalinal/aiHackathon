@@ -36,7 +36,7 @@ const fileFilter = (req, file, cb) => {
   if (config.upload.allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error(`Invalid file type. Allowed types: ${config.upload.allowedMimeTypes.join(', ')}`), false);
+    cb(new Error(`Geçersiz dosya türü. İzin verilen türler: ${config.upload.allowedMimeTypes.join(', ')}`), false);
   }
 };
 
@@ -54,18 +54,18 @@ const handleUploadError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
-        error: 'File too large',
-        message: `Maximum file size is ${config.upload.maxFileSize / (1024 * 1024)}MB`,
+        error: 'Dosya çok büyük',
+        message: `Maksimum dosya boyutu ${config.upload.maxFileSize / (1024 * 1024)}MB`,
       });
     }
     return res.status(400).json({
-      error: 'Upload error',
+      error: 'Yükleme hatası',
       message: err.message,
     });
   }
   if (err) {
     return res.status(400).json({
-      error: 'Upload failed',
+      error: 'Yükleme başarısız',
       message: err.message,
     });
   }

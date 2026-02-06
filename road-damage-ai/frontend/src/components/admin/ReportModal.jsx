@@ -36,6 +36,17 @@ export default function ReportModal({ report, onClose, onStatusChange }) {
     return colors[severity] || '#6b7280';
   };
 
+  const getDamageTypeText = (type) => {
+    const types = {
+      pothole: 'Çukur',
+      crack: 'Çatlak',
+      rutting: 'Tekerlek İzi',
+      patching: 'Yama',
+      erosion: 'Aşınma',
+    };
+    return types[type] || type || 'Analiz bekleniyor';
+  };
+
   const imageUrl = report.image_path
     ? `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:3001'}/${report.image_path}`
     : null;
@@ -75,13 +86,13 @@ export default function ReportModal({ report, onClose, onStatusChange }) {
             <div className="detail-item">
               <label>Durum</label>
               <span className={`status-badge status-${report.status}`}>
-                {report.status}
+                {report.status === 'pending' ? 'Bekliyor' : report.status === 'analyzing' ? 'Analiz Ediliyor' : report.status === 'analyzed' ? 'Analiz Edildi' : report.status === 'repaired' ? 'Onarıldı' : report.status === 'rejected' ? 'Reddedildi' : report.status}
               </span>
             </div>
 
             <div className="detail-item">
               <label>Hasar Türü</label>
-              <span>{report.damage_type || 'Analiz bekleniyor'}</span>
+              <span>{getDamageTypeText(report.damage_type)}</span>
             </div>
 
             <div className="detail-item">
@@ -91,7 +102,7 @@ export default function ReportModal({ report, onClose, onStatusChange }) {
                   className="severity-badge"
                   style={{ backgroundColor: getSeverityColor(report.severity) }}
                 >
-                  {report.severity.toUpperCase()}
+                  {report.severity === 'low' ? 'DÜŞÜK' : report.severity === 'medium' ? 'ORTA' : report.severity === 'high' ? 'YÜKSEK' : report.severity.toUpperCase()}
                 </span>
               ) : (
                 <span>-</span>
