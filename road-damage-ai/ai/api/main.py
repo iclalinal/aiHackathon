@@ -18,7 +18,7 @@ from inference.infer import analyze_image
 
 app = FastAPI(title="Road Damage AI Service")
 
-# CORS middleware
+# CORS middleware - allow all origins
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -30,25 +30,6 @@ app.add_middleware(
 # Temporary upload directory
 TEMP_DIR = os.path.join(os.path.dirname(__file__), "temp_uploads")
 os.makedirs(TEMP_DIR, exist_ok=True)
-
-# Cost estimation based on severity and damage type
-COST_ESTIMATES = {
-    "pothole": {"low": 500, "medium": 1500, "high": 3500},
-    "crack": {"low": 300, "medium": 800, "high": 2000},
-    "rutting": {"low": 400, "medium": 1200, "high": 3000},
-    "patching": {"low": 200, "medium": 600, "high": 1500},
-    "erosion": {"low": 600, "medium": 1800, "high": 4000},
-}
-
-
-def estimate_cost(damage_type: str, severity: str) -> float:
-    """Estimate repair cost based on damage type and severity"""
-    base_cost = COST_ESTIMATES.get(damage_type, COST_ESTIMATES["pothole"])
-    cost = base_cost.get(severity, base_cost["medium"])
-    # Add some variation
-    import random
-    variation = random.uniform(0.9, 1.1)
-    return round(cost * variation, 2)
 
 
 @app.get("/health")
@@ -72,13 +53,15 @@ async def analyze(
     Returns:
         damage_type: Type of damage detected
         severity: low, medium, or high
-        estimated_cost: Estimated repair cost
+        estimated_cost: Estimated repair cost (from infer.py - Area × Depth × 3000 TL/m³)
         confidence: Model confidence score
+        calculation_method: "Reference Line" or "Standard"
+        area_m2: Calculated area in square meters
     """
     temp_path = None
     
     try:
-        # Save uploaded file temporarily
+        # Save uploaded file temporarily with uuid
         file_ext = os.path.splitext(image.filename)[1] or ".jpg"
         temp_filename = f"{uuid.uuid4()}{file_ext}"
         temp_path = os.path.join(TEMP_DIR, temp_filename)
@@ -86,7 +69,7 @@ async def analyze(
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(image.file, buffer)
         
-        # Run YOLO inference
+        # Run YOLO inference - all cost calculation happens in analyze_image
         result = analyze_image(temp_path)
         
         if result is None:
@@ -100,30 +83,29 @@ async def analyze(
                 "report_id": report_id,
             }
         
-        damage_type = result.get("type", "pothole")
-        severity = result.get("severity", "medium")
-        confidence = result.get("confidence", 0.5)
-        
-        # Estimate cost
-        estimated_cost = estimate_cost(damage_type, severity)
-        
+        # Return values directly from the inference result
+        # Cost is already calculated in infer.py using: Area × Depth × UNIT_PRICE_PER_M3
         return {
-            "damage_type": damage_type,
-            "severity": severity,
-            "estimated_cost": estimated_cost,
-            "confidence": confidence,
-            "area_ratio": result.get("area_ratio", 0),
+            "damage_type": result.get("type", "pothole"),
+            "severity": result.get("severity", "medium"),
+            "estimated_cost": result.get("estimated_cost", 0),
+            "confidence": result.get("confidence", 0.5),
+            "area_m2": result.get("area_m2", 0),
+            "calculation_method": result.get("calculation_method", "Standard"),
+            "detection_count": result.get("detection_count", 1),
             "visual_path": result.get("visual_path"),
             "report_id": report_id,
         }
         
     except Exception as e:
         print(f"Analysis error: {e}")
+        import traceback
+        traceback.print_exc()
         return {
             "error": str(e),
-            "damage_type": "pothole",  # Fallback
-            "severity": "medium",
-            "estimated_cost": 1500,
+            "damage_type": None,
+            "severity": None,
+            "estimated_cost": 0,
             "confidence": 0,
             "report_id": report_id,
         }
