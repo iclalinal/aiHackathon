@@ -59,9 +59,25 @@ class ApiService {
 
   /**
    * Get report status by ID
+   * Returns { notFound: true } if report was deleted (no damage detected)
    */
   async getReportStatus(reportId) {
-    return this.request(`/reports/${reportId}`);
+    try {
+      const url = `${this.baseUrl}/reports/${reportId}/status`;
+      const response = await fetch(url, {
+        headers: this.getAuthHeaders(),
+      });
+      
+      if (response.status === 404) {
+        return { notFound: true };
+      }
+      
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('getReportStatus error:', error);
+      throw error;
+    }
   }
 
   /**
