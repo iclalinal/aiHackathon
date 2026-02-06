@@ -166,6 +166,21 @@ class ApiService {
   }
 
   /**
+   * Get grouped reports by location (admin)
+   */
+  async getGroupedReports(filters = {}, radius = 2) {
+    const params = new URLSearchParams();
+    
+    if (filters.status) params.append('status', filters.status);
+    if (filters.severity) params.append('severity', filters.severity);
+    if (filters.damageType) params.append('damageType', filters.damageType);
+    params.append('radius', radius);
+
+    const query = params.toString();
+    return this.request(`/admin/reports-grouped${query ? `?${query}` : ''}`);
+  }
+
+  /**
    * Get single report (admin)
    */
   async getAdminReport(reportId) {

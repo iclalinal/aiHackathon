@@ -49,7 +49,7 @@ export default function ReportTable({ reports, onStatusChange, onViewDetails }) 
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleDateString('en-US', {
+    return new Date(dateStr).toLocaleDateString('tr-TR', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -60,9 +60,9 @@ export default function ReportTable({ reports, onStatusChange, onViewDetails }) 
 
   const formatCurrency = (amount) => {
     if (!amount) return '-';
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('tr-TR', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'TRY',
     }).format(amount);
   };
 
@@ -75,29 +75,29 @@ export default function ReportTable({ reports, onStatusChange, onViewDetails }) 
               ID {sortField === 'id' && (sortOrder === 'asc' ? '↑' : '↓')}
             </th>
             <th onClick={() => handleSort('created_at')} className="sortable">
-              Date {sortField === 'created_at' && (sortOrder === 'asc' ? '↑' : '↓')}
+              Tarih {sortField === 'created_at' && (sortOrder === 'asc' ? '↑' : '↓')}
             </th>
-            <th>Location</th>
+            <th>Konum</th>
             <th onClick={() => handleSort('damage_type')} className="sortable">
-              Type {sortField === 'damage_type' && (sortOrder === 'asc' ? '↑' : '↓')}
+              Tür {sortField === 'damage_type' && (sortOrder === 'asc' ? '↑' : '↓')}
             </th>
             <th onClick={() => handleSort('severity')} className="sortable">
-              Severity {sortField === 'severity' && (sortOrder === 'asc' ? '↑' : '↓')}
+              Şiddet {sortField === 'severity' && (sortOrder === 'asc' ? '↑' : '↓')}
             </th>
             <th onClick={() => handleSort('estimated_cost')} className="sortable">
-              Est. Cost {sortField === 'estimated_cost' && (sortOrder === 'asc' ? '↑' : '↓')}
+              Tah. Maliyet {sortField === 'estimated_cost' && (sortOrder === 'asc' ? '↑' : '↓')}
             </th>
             <th onClick={() => handleSort('status')} className="sortable">
-              Status {sortField === 'status' && (sortOrder === 'asc' ? '↑' : '↓')}
+              Durum {sortField === 'status' && (sortOrder === 'asc' ? '↑' : '↓')}
             </th>
-            <th>Actions</th>
+            <th>İşlemler</th>
           </tr>
         </thead>
         <tbody>
           {sortedReports.length === 0 ? (
             <tr>
               <td colSpan="8" className="empty-state">
-                No reports found
+                Rapor bulunamadı
               </td>
             </tr>
           ) : (
@@ -141,7 +141,7 @@ export default function ReportTable({ reports, onStatusChange, onViewDetails }) 
                   <button
                     className="btn-icon"
                     onClick={() => onViewDetails(report)}
-                    title="View Details"
+                    title="Detayları Gör"
                   >
                     👁️
                   </button>
@@ -149,7 +149,7 @@ export default function ReportTable({ reports, onStatusChange, onViewDetails }) 
                     <button
                       className="btn-icon btn-success"
                       onClick={() => onStatusChange(report.id, 'repaired')}
-                      title="Mark as Repaired"
+                      title="Onarıldı Olarak İşaretle"
                     >
                       ✓
                     </button>

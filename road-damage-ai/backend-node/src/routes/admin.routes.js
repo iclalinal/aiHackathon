@@ -48,6 +48,36 @@ router.get('/reports', (req, res) => {
 });
 
 /**
+ * GET /api/admin/reports/grouped
+ * Get reports grouped by location (within 2 meter radius)
+ */
+router.get('/reports-grouped', (req, res) => {
+  try {
+    const filters = {
+      status: req.query.status,
+      severity: req.query.severity,
+      damageType: req.query.damageType,
+      sortBy: req.query.sortBy || 'created_at',
+      sortOrder: req.query.sortOrder || 'desc',
+    };
+
+    const radius = req.query.radius ? parseFloat(req.query.radius) : 2;
+    const groups = reportService.getGroupedReports(filters, radius);
+
+    res.json({
+      count: groups.length,
+      totalReports: groups.reduce((sum, g) => sum + g.reportCount, 0),
+      data: groups,
+    });
+  } catch (error) {
+    console.error('Get grouped reports error:', error);
+    res.status(500).json({
+      error: 'Failed to get grouped reports',
+    });
+  }
+});
+
+/**
  * GET /api/admin/reports/:id
  * Get single report with full details (admin only)
  */

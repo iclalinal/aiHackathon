@@ -29,18 +29,18 @@ export default function AdminDashboard() {
   };
 
   const formatCurrency = (amount) => {
-    if (!amount) return '$0';
-    return new Intl.NumberFormat('en-US', {
+    if (!amount) return '₺0';
+    return new Intl.NumberFormat('tr-TR', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'TRY',
       maximumFractionDigits: 0,
     }).format(amount);
   };
 
   if (loading) {
     return (
-      <AdminLayout title="Dashboard">
-        <div className="loading-state">Loading dashboard...</div>
+      <AdminLayout title="Kontrol Paneli">
+        <div className="loading-state">Yükleniyor...</div>
       </AdminLayout>
     );
   }
@@ -48,49 +48,49 @@ export default function AdminDashboard() {
   return (
     <>
       <Head>
-        <title>Dashboard - Road Damage Admin</title>
+        <title>Kontrol Paneli - Yol Hasarı Yönetici</title>
       </Head>
 
-      <AdminLayout title="Dashboard">
+      <AdminLayout title="Kontrol Paneli">
         {/* Stats Grid */}
         <div className="stats-grid">
           <StatCard
-            title="Total Reports"
+            title="Toplam Rapor"
             value={stats?.total || 0}
             icon="📋"
             color="blue"
           />
           <StatCard
-            title="Pending Analysis"
+            title="Analiz Bekleyen"
             value={(stats?.pending || 0) + (stats?.analyzing || 0)}
             icon="⏳"
             color="yellow"
           />
           <StatCard
-            title="High Priority"
+            title="Yüksek Öncelik"
             value={stats?.high_priority || 0}
             icon="🔴"
             color="red"
-            subtitle="Unrepaired high severity"
+            subtitle="Onarılmamış yüksek şiddet"
           />
           <StatCard
-            title="Repaired"
+            title="Onarılmış"
             value={stats?.repaired || 0}
             icon="✅"
             color="green"
           />
           <StatCard
-            title="Avg. Repair Cost"
+            title="Ort. Onarım Maliyeti"
             value={formatCurrency(stats?.avg_cost)}
             icon="💰"
             color="purple"
           />
           <StatCard
-            title="Total Estimated"
+            title="Toplam Tahmini"
             value={formatCurrency(stats?.total_estimated_cost)}
             icon="📊"
             color="indigo"
-            subtitle="All unrepaired"
+            subtitle="Tüm onarılmamışlar"
           />
         </div>
 
@@ -98,7 +98,7 @@ export default function AdminDashboard() {
         <div className="dashboard-row">
           {/* By Severity */}
           <div className="dashboard-card">
-            <h3>Reports by Severity</h3>
+            <h3>Şiddete Göre Raporlar</h3>
             <div className="severity-chart">
               {stats?.bySeverity?.map((item) => (
                 <div key={item.severity} className="chart-bar-container">
@@ -119,7 +119,7 @@ export default function AdminDashboard() {
 
           {/* By Damage Type */}
           <div className="dashboard-card">
-            <h3>Reports by Damage Type</h3>
+            <h3>Hasar Türüne Göre Raporlar</h3>
             <div className="damage-type-list">
               {stats?.byDamageType?.map((item) => (
                 <div key={item.damage_type} className="type-item">
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
                 </div>
               ))}
               {(!stats?.byDamageType || stats.byDamageType.length === 0) && (
-                <p className="empty-message">No analyzed reports yet</p>
+                <p className="empty-message">Henüz analiz edilmiş rapor yok</p>
               )}
             </div>
           </div>
@@ -137,9 +137,9 @@ export default function AdminDashboard() {
         {/* Recent Reports */}
         <div className="dashboard-card full-width">
           <div className="card-header">
-            <h3>Recent Reports</h3>
+            <h3>Son Raporlar</h3>
             <a href="/admin/reports" className="view-all-link">
-              View all →
+              Tümünü gör →
             </a>
           </div>
           <div className="recent-reports-list">
@@ -149,10 +149,10 @@ export default function AdminDashboard() {
                   <span className={`status-dot status-${report.status}`} />
                   <div className="report-details">
                     <span className="report-type">
-                      {report.damage_type || 'Pending Analysis'}
+                      {report.damage_type || 'Analiz Bekliyor'}
                     </span>
                     <span className="report-date">
-                      {new Date(report.created_at).toLocaleDateString()}
+                      {new Date(report.created_at).toLocaleDateString('tr-TR')}
                     </span>
                   </div>
                 </div>
@@ -167,7 +167,7 @@ export default function AdminDashboard() {
               </div>
             ))}
             {recentReports.length === 0 && (
-              <p className="empty-message">No reports yet</p>
+              <p className="empty-message">Henüz rapor yok</p>
             )}
           </div>
         </div>

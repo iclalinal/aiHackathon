@@ -134,6 +134,20 @@ const UploadForm = () => {
     return types[type] || type;
   };
 
+  const handleClear = () => {
+    setImage(null);
+    setImagePreview(null);
+    setResult(null);
+    setReportId(null);
+    setNoDamageDetected(false);
+    setLoading(false);
+    setPolling(false);
+    setPollCount(0);
+  };
+
+  // Şikayet gönderildi mi kontrolü
+  const isSubmitted = result !== null || noDamageDetected;
+
   return (
     <>
       {/* ANA FORM KARTI */}
@@ -144,7 +158,8 @@ const UploadForm = () => {
 
         <div
           className="upload-box"
-          onClick={() => document.getElementById("fileInput").click()}
+          onClick={() => !isSubmitted && document.getElementById("fileInput").click()}
+          style={isSubmitted ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
         >
           <input
             id="fileInput"
@@ -152,6 +167,7 @@ const UploadForm = () => {
             accept="image/*"
             hidden
             onChange={handleImageChange}
+            disabled={isSubmitted}
           />
 
           {imagePreview ? (
@@ -216,9 +232,27 @@ const UploadForm = () => {
         )}
 
         <div className="button-center">
-          <button onClick={handleSubmit} disabled={loading}>
-            {loading ? (polling ? 'Analiz ediliyor...' : 'Gönderiliyor...') : 'Şikayet Gönder'}
+          <button 
+            onClick={handleSubmit} 
+            disabled={loading || isSubmitted}
+            style={isSubmitted ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+          >
+            {loading ? (polling ? 'Analiz ediliyor...' : 'Gönderiliyor...') : (
+              isSubmitted ? 'Şikayet Gönderildi' : 'Şikayet Gönder'
+            )}
           </button>
+          
+          {isSubmitted && (
+            <button 
+              onClick={handleClear}
+              style={{ 
+                marginLeft: 12,
+                background: 'var(--muted-text, #6b7280)',
+              }}
+            >
+              Yeni Şikayet
+            </button>
+          )}
         </div>
       </div>
 
@@ -239,32 +273,18 @@ const UploadForm = () => {
 
       {/* ANALİZ SONUCU */}
       {result && !noDamageDetected && (
-        <div className="card" style={{ marginTop: 32 }}>
-          <h3 style={{ marginBottom: 12 }}>
-            Analiz Sonucu (Yapay Zekâ)
+        <div className="card" style={{ marginTop: 32, borderColor: '#27ae60' }}>
+          <h3 style={{ marginBottom: 12, color: '#27ae60' }}>
+            ✓ Şikayetiniz Alındı
           </h3>
 
-          <p>
-            <b>Hasar Türü:</b> {getDamageTypeText(result.type)}
+          <p style={{ fontSize: 16, marginBottom: 12 }}>
+            Fotoğrafınız başarıyla analiz edildi ve <strong>gerekli mercilere şikayetiniz iletilmiştir</strong>.
           </p>
 
-          <p>
-            <b>Önem Seviyesi:</b>{" "}
-            <span className={`badge ${result.severity}`}>
-              {getSeverityText(result.severity)}
-            </span>
+          <p style={{ opacity: 0.7 }}>
+            İlgili birimler tarafından değerlendirilerek en kısa sürede işleme alınacaktır.
           </p>
-
-          <p>
-            <b>Tahmini Müdahale Maliyeti:</b>{" "}
-            {result.estimated_cost} TL
-          </p>
-
-          {reportId && (
-            <p style={{ marginTop: 12, fontSize: 12, opacity: 0.7 }}>
-              Rapor ID: {reportId}
-            </p>
-          )}
         </div>
       )}
     </>

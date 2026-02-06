@@ -25,9 +25,9 @@ export default function ReportModal({ report, onClose, onStatusChange }) {
 
   const formatCurrency = (amount) => {
     if (!amount) return '-';
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('tr-TR', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'TRY',
     }).format(amount);
   };
 
@@ -45,7 +45,7 @@ export default function ReportModal({ report, onClose, onStatusChange }) {
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>×</button>
         
-        <h2>Report Details</h2>
+        <h2>Rapor Detayları</h2>
         
         <div className="modal-body">
           {/* Image */}
@@ -53,7 +53,7 @@ export default function ReportModal({ report, onClose, onStatusChange }) {
             {imageUrl ? (
               <img
                 src={imageUrl}
-                alt="Damage Report"
+                alt="Hasar Raporu"
                 className="report-image"
                 onError={(e) => {
                   e.target.src = '/placeholder-image.png';
@@ -61,31 +61,31 @@ export default function ReportModal({ report, onClose, onStatusChange }) {
                 }}
               />
             ) : (
-              <div className="no-image">No image available</div>
+              <div className="no-image">Görsel mevcut değil</div>
             )}
           </div>
 
           {/* Details Grid */}
           <div className="details-grid">
             <div className="detail-item">
-              <label>Report ID</label>
+              <label>Rapor ID</label>
               <span className="mono">{report.id}</span>
             </div>
 
             <div className="detail-item">
-              <label>Status</label>
+              <label>Durum</label>
               <span className={`status-badge status-${report.status}`}>
                 {report.status}
               </span>
             </div>
 
             <div className="detail-item">
-              <label>Damage Type</label>
-              <span>{report.damage_type || 'Pending analysis'}</span>
+              <label>Hasar Türü</label>
+              <span>{report.damage_type || 'Analiz bekleniyor'}</span>
             </div>
 
             <div className="detail-item">
-              <label>Severity</label>
+              <label>Şiddet</label>
               {report.severity ? (
                 <span
                   className="severity-badge"
@@ -99,12 +99,12 @@ export default function ReportModal({ report, onClose, onStatusChange }) {
             </div>
 
             <div className="detail-item">
-              <label>Estimated Cost</label>
+              <label>Tahmini Maliyet</label>
               <span className="cost">{formatCurrency(report.estimated_cost)}</span>
             </div>
 
             <div className="detail-item">
-              <label>Location</label>
+              <label>Konum</label>
               <a
                 href={`https://www.google.com/maps?q=${report.latitude},${report.longitude}`}
                 target="_blank"
@@ -116,28 +116,28 @@ export default function ReportModal({ report, onClose, onStatusChange }) {
             </div>
 
             <div className="detail-item full-width">
-              <label>Description</label>
-              <span>{report.description || 'No description provided'}</span>
+              <label>Açıklama</label>
+              <span>{report.description || 'Açıklama girilmemiş'}</span>
             </div>
 
             <div className="detail-item">
-              <label>Submitted</label>
+              <label>Gönderilme</label>
               <span>{formatDate(report.created_at)}</span>
             </div>
 
             <div className="detail-item">
-              <label>Analyzed</label>
+              <label>Analiz</label>
               <span>{formatDate(report.analyzed_at)}</span>
             </div>
 
             {report.repaired_at && (
               <>
                 <div className="detail-item">
-                  <label>Repaired</label>
+                  <label>Onarım</label>
                   <span>{formatDate(report.repaired_at)}</span>
                 </div>
                 <div className="detail-item full-width">
-                  <label>Repair Notes</label>
+                  <label>Onarım Notları</label>
                   <span>{report.repair_notes || '-'}</span>
                 </div>
               </>
@@ -148,11 +148,11 @@ export default function ReportModal({ report, onClose, onStatusChange }) {
           {report.status !== 'repaired' && (
             <div className="modal-actions">
               <div className="notes-input">
-                <label>Notes (optional)</label>
+                <label>Notlar (opsiyonel)</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Add notes about this action..."
+                  placeholder="Bu işlem hakkında not ekleyin..."
                   rows={2}
                 />
               </div>
@@ -164,7 +164,7 @@ export default function ReportModal({ report, onClose, onStatusChange }) {
                     onClick={() => handleStatusChange('repaired')}
                     disabled={updating}
                   >
-                    {updating ? 'Updating...' : '✓ Mark as Repaired'}
+                    {updating ? 'Güncelleniyor...' : '✓ Onarıldı Olarak İşaretle'}
                   </button>
                 )}
 
@@ -174,7 +174,7 @@ export default function ReportModal({ report, onClose, onStatusChange }) {
                     onClick={() => handleStatusChange('rejected')}
                     disabled={updating}
                   >
-                    {updating ? 'Updating...' : '✗ Reject Report'}
+                    {updating ? 'Güncelleniyor...' : '✗ Raporu Reddet'}
                   </button>
                 )}
               </div>

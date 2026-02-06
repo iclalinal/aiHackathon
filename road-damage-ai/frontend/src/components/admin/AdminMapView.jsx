@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-export default function AdminMapView({ reports, onMarkerClick, selectedReport }) {
+export default function AdminMapView({ reports, onMarkerClick, selectedReport, viewMode }) {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersRef = useRef([]);
@@ -61,8 +61,36 @@ export default function AdminMapView({ reports, onMarkerClick, selectedReport })
       return colors[severity] || '#3b82f6';
     };
 
-    const getMarkerIcon = (severity, status) => {
+    const getMarkerIcon = (severity, status, isGroup = false, reportCount = 1) => {
       const color = getMarkerColor(severity, status);
+      
+      if (isGroup) {
+        // Group marker - larger with folder icon and count
+        return L.divIcon({
+          className: 'custom-marker group-marker',
+          html: `
+            <div style="
+              background-color: ${reportCount > 1 ? '#f2c200' : color};
+              width: ${reportCount > 1 ? '36px' : '28px'};
+              height: ${reportCount > 1 ? '36px' : '28px'};
+              border-radius: 50%;
+              border: 3px solid white;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: ${reportCount > 1 ? '#1a1a1a' : 'white'};
+              font-size: ${reportCount > 1 ? '14px' : '12px'};
+              font-weight: bold;
+            ">
+              ${reportCount > 1 ? reportCount : (severity?.[0]?.toUpperCase() || '?')}
+            </div>
+          `,
+          iconSize: [reportCount > 1 ? 36 : 28, reportCount > 1 ? 36 : 28],
+          iconAnchor: [reportCount > 1 ? 18 : 14, reportCount > 1 ? 18 : 14],
+        });
+      }
+      
       return L.divIcon({
         className: 'custom-marker',
         html: `
@@ -88,31 +116,49 @@ export default function AdminMapView({ reports, onMarkerClick, selectedReport })
       });
     };
 
-    // Add markers for each report
+    // Add markers for each report or group
     const bounds = [];
-    reports.forEach((report) => {
-      if (report.latitude && report.longitude) {
-        const marker = L.marker([report.latitude, report.longitude], {
-          icon: getMarkerIcon(report.severity, report.status),
+    reports.forEach((item) => {
+      const lat = item.latitude || item.centerLat;
+      const lng = item.longitude || item.centerLng;
+      
+      if (lat && lng) {
+        const isGroup = item.isGroup;
+        const marker = L.marker([lat, lng], {
+          icon: getMarkerIcon(item.severity, item.status, isGroup, item.reportCount),
         }).addTo(map);
 
-        marker.bindPopup(`
-          <div style="min-width: 200px;">
-            <strong>${report.damage_type || 'Unknown'}</strong><br/>
-            <span style="color: ${getMarkerColor(report.severity, report.status)}">
-              ${report.severity || 'Pending'} severity
-            </span><br/>
-            <small>Status: ${report.status}</small><br/>
-            ${report.estimated_cost ? `<small>Est. cost: $${report.estimated_cost.toFixed(2)}</small>` : ''}
-          </div>
-        `);
+        if (isGroup) {
+          // Group popup
+          marker.bindPopup(`
+            <div style="min-width: 200px;">
+              <strong>📁 ${item.reportCount} Şikayet</strong><br/>
+              <span style="color: ${getMarkerColor(item.severity, null)}">
+                ${item.group?.severities?.join(', ') || 'Belirsiz'} şiddet
+              </span><br/>
+              <small>Detaylar için tıklayın</small>
+            </div>
+          `);
+        } else {
+          // Regular report popup
+          marker.bindPopup(`
+            <div style="min-width: 200px;">
+              <strong>${item.damage_type || 'Bilinmiyor'}</strong><br/>
+              <span style="color: ${getMarkerColor(item.severity, item.status)}">
+                ${item.severity || 'Bekliyor'} şiddet
+              </span><br/>
+              <small>Durum: ${item.status}</small><br/>
+              ${item.estimated_cost ? `<small>Tahmini maliyet: ₺${item.estimated_cost.toFixed(2)}</small>` : ''}
+            </div>
+          `);
+        }
 
         marker.on('click', () => {
-          if (onMarkerClick) onMarkerClick(report);
+          if (onMarkerClick) onMarkerClick(item);
         });
 
         markersRef.current.push(marker);
-        bounds.push([report.latitude, report.longitude]);
+        bounds.push([lat, lng]);
       }
     });
 
@@ -120,7 +166,7 @@ export default function AdminMapView({ reports, onMarkerClick, selectedReport })
     if (bounds.length > 0) {
       map.fitBounds(bounds, { padding: [50, 50] });
     }
-  }, [reports, mapLoaded, onMarkerClick]);
+  }, [reports, mapLoaded, onMarkerClick, viewMode]);
 
   // Highlight selected report
   useEffect(() => {
@@ -136,23 +182,29 @@ export default function AdminMapView({ reports, onMarkerClick, selectedReport })
       
       {/* Legend */}
       <div className="map-legend">
-        <h4>Legend</h4>
+        <h4>Gösterge</h4>
         <div className="legend-item">
           <span className="legend-dot" style={{ backgroundColor: '#ef4444' }}></span>
-          High Severity
+          Yüksek Şiddet
         </div>
         <div className="legend-item">
           <span className="legend-dot" style={{ backgroundColor: '#f59e0b' }}></span>
-          Medium Severity
+          Orta Şiddet
         </div>
         <div className="legend-item">
           <span className="legend-dot" style={{ backgroundColor: '#22c55e' }}></span>
-          Low / Repaired
+          Düşük / Onarıldı
         </div>
         <div className="legend-item">
           <span className="legend-dot" style={{ backgroundColor: '#6b7280' }}></span>
-          Pending
+          Bekliyor
         </div>
+        {viewMode === 'grouped' && (
+          <div className="legend-item">
+            <span className="legend-dot" style={{ backgroundColor: '#f2c200' }}></span>
+            Çoklu Şikayet Grubu
+          </div>
+        )}
       </div>
     </div>
   );

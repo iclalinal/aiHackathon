@@ -220,6 +220,93 @@ class ReportService {
       byDamageType,
     };
   }
+
+  /**
+   * Calculate distance between two coordinates in meters (Haversine formula)
+   */
+  calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371000; // Earth's radius in meters
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+
+  /**
+   * Group reports by location (within specified radius in meters)
+   */
+  getGroupedReports(filters = {}, radiusMeters = 2) {
+    // Get all reports first
+    const reports = this.getReports(filters);
+    
+    // Group reports by proximity
+    const groups = [];
+    const assignedReports = new Set();
+
+    for (const report of reports) {
+      if (assignedReports.has(report.id)) continue;
+
+      // Start a new group with this report
+      const group = {
+        id: `group_${groups.length + 1}`,
+        centerLat: report.latitude,
+        centerLng: report.longitude,
+        reports: [report],
+        reportCount: 1,
+        latestReport: report.created_at,
+        earliestReport: report.created_at,
+      };
+
+      assignedReports.add(report.id);
+
+      // Find all nearby reports
+      for (const otherReport of reports) {
+        if (assignedReports.has(otherReport.id)) continue;
+
+        const distance = this.calculateDistance(
+          report.latitude, report.longitude,
+          otherReport.latitude, otherReport.longitude
+        );
+
+        if (distance <= radiusMeters) {
+          group.reports.push(otherReport);
+          group.reportCount++;
+          assignedReports.add(otherReport.id);
+
+          // Update center (average of all coordinates)
+          const totalReports = group.reports.length;
+          group.centerLat = group.reports.reduce((sum, r) => sum + r.latitude, 0) / totalReports;
+          group.centerLng = group.reports.reduce((sum, r) => sum + r.longitude, 0) / totalReports;
+
+          // Update date range
+          if (new Date(otherReport.created_at) > new Date(group.latestReport)) {
+            group.latestReport = otherReport.created_at;
+          }
+          if (new Date(otherReport.created_at) < new Date(group.earliestReport)) {
+            group.earliestReport = otherReport.created_at;
+          }
+        }
+      }
+
+      // Calculate group summary
+      group.hasHighPriority = group.reports.some(r => r.severity === 'high');
+      group.severities = [...new Set(group.reports.filter(r => r.severity).map(r => r.severity))];
+      group.damageTypes = [...new Set(group.reports.filter(r => r.damage_type).map(r => r.damage_type))];
+      group.statuses = [...new Set(group.reports.map(r => r.status))];
+      group.totalEstimatedCost = group.reports.reduce((sum, r) => sum + (r.estimated_cost || 0), 0);
+
+      groups.push(group);
+    }
+
+    // Sort groups by report count (most reports first)
+    groups.sort((a, b) => b.reportCount - a.reportCount);
+
+    return groups;
+  }
 }
 
 module.exports = new ReportService();

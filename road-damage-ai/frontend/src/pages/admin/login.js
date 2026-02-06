@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useAuth } from '../../context/AuthContext';
+import ThemeToggle from '../../components/ThemeToggle';
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('');
@@ -26,7 +27,7 @@ export default function AdminLogin() {
       await login(username, password);
       router.push('/admin/dashboard');
     } catch (err) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+      setError(err.message || 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.');
     } finally {
       setLoading(false);
     }
@@ -35,14 +36,17 @@ export default function AdminLogin() {
   return (
     <>
       <Head>
-        <title>Admin Login - Road Damage Reporting</title>
+        <title>Yönetici Girişi - Yol Hasarı Şikayet Sistemi</title>
       </Head>
 
       <div className="login-page">
+        <div className="login-theme-toggle">
+          <ThemeToggle />
+        </div>
         <div className="login-container">
           <div className="login-header">
-            <h1>🛣️ Road Damage</h1>
-            <p>Municipal Admin Portal</p>
+            <h1>🛣️ Yol Hasarı</h1>
+            <p>Belediye Yönetici Paneli</p>
           </div>
 
           <form onSubmit={handleSubmit} className="login-form">
@@ -53,26 +57,26 @@ export default function AdminLogin() {
             )}
 
             <div className="form-group">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="username">Kullanıcı Adı</label>
               <input
                 type="text"
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username"
+                placeholder="Kullanıcı adınızı girin"
                 required
                 autoComplete="username"
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">Şifre</label>
               <input
                 type="password"
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
+                placeholder="Şifrenizi girin"
                 required
                 autoComplete="current-password"
               />
@@ -83,12 +87,12 @@ export default function AdminLogin() {
               className="btn btn-primary btn-full"
               disabled={loading}
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
             </button>
           </form>
 
           <div className="login-footer">
-            <a href="/">← Back to public site</a>
+            <a href="/">← Ana sayfaya dön</a>
           </div>
         </div>
       </div>
